@@ -34,6 +34,7 @@ public class AudioAnalyser {
      * create an AudioAnalyser object
      */
     public AudioAnalyser() {
+	fftCalculator = new FFTCalculator(1024);
 	
     }
     
@@ -42,7 +43,7 @@ public class AudioAnalyser {
      * @param audio	audio to be analyzed
      */
     public void analyze(Audio audio) {
-	
+	powerSpectrum = fftCalculator.calculatePower(audio.getSample());
     }
     
     /**

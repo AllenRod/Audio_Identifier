@@ -23,9 +23,17 @@ public class PowerSpectrum {
     
     /**
      * create a PowerSpectrum object
+     * @param maxPower		maximum power of each section
+     * @param nyquistFreq	the nyquist frequency
+     * @param power		the power of each section and freqeuncy
+     * @param sectionSize	number of sample in each section
      */
-    public PowerSpectrum() {
-	
+    public PowerSpectrum(double[] maxPower, double[][] power, 
+	    int nyquistFreq, int sectionSize) {
+	this.maxPower = maxPower;
+	this.nyquistFreq = nyquistFreq;
+	this.power = power;
+	this.sectionSize = sectionSize;
     }
     
     /**
