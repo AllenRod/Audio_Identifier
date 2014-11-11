@@ -57,12 +57,12 @@ public class FFTCalculator {
 	}
 	
 	// calculate the power
-	for (int i = 0; i < fftArray.length / 2; i++) {
+	for (int i = 0; i < fftArray.length; i++) {
 	    // index of the result array to put in result
 	    int index = 0;
 	    
 	    // calculate the power in each section
-	    for (int j = 0; j < fftArray[i].length; j += 2) {
+	    for (int j = 0; j < nyqFreq; j += 2) {
 		// adding the square of sine wave and cosine wave
 		double power = fftArray[i][j] * fftArray[i][j] + 
 			fftArray[i][j + 1] * fftArray[i][j + 1];

@@ -1,5 +1,6 @@
 package audioframe;
 import java.io.*;
+
 import javax.sound.sampled.*;
 import javax.swing.JPanel;
 
@@ -35,6 +36,14 @@ public class Audio {
 	this.format = format;
 	this.sample = sample;
 	duration = (double)size() / 8000;
+    }
+    
+    /**
+     * construct the graph view of this audio
+     * @param power	power spectrum of the sample
+     */
+    public void constructView(PowerSpectrum power) {
+	graphView = new AudioGraphView(getSample(), power);
     }
     
     /**
@@ -104,7 +113,7 @@ public class Audio {
      * return the graph view of the audio
      * @return 	graph view of the audio
      */
-    public JPanel showView() {
+    public JPanel getView() {
 	return graphView;
     }
     

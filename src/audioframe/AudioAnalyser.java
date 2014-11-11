@@ -35,7 +35,6 @@ public class AudioAnalyser {
      */
     public AudioAnalyser() {
 	fftCalculator = new FFTCalculator(1024);
-	
     }
     
     /**
