@@ -9,6 +9,7 @@ import javax.swing.*;
 /**
  * Waveform view of the audio.
  * 
+ * @author Eugene W. Stark
  * @author Jiajie Li
  * CSE 260 PRJ 2
  * 10/25/14
@@ -22,6 +23,9 @@ public class WaveformPanel extends JPanel{
 
     // zoom factor of the graph
     private double hzoom;
+    
+    // length of the audio
+    private int length;
 
     /**
      * create a WaveformPanel object
@@ -32,6 +36,7 @@ public class WaveformPanel extends JPanel{
 	super();
 	
 	this.sample = sample;
+	length = sample.length;
 	
 	// determine the maximum amplitude
 	maxAmp = Double.MIN_NORMAL;
@@ -99,8 +104,8 @@ public class WaveformPanel extends JPanel{
      */
     public void setZoom(double horiz) {
 	hzoom = horiz;
-	int width = (int)(sample.length / hzoom);
-	int height = 100;
+	int width = (int)(length / hzoom);
+	int height = 250;
 	setPreferredSize(new Dimension(width, height));
 	revalidate();
     }

@@ -14,14 +14,19 @@ public class FFTCalculator {
     // the fft algorithm that decompose the samples
     private DoubleFFT_1D fftransformer;
     
-    // numbers of samples in each section
-    private int sectionSize;
-    
     // total numbers of sections in the sample
     private int sectionNum;
     
+    // numbers of samples in each section
+    private int sectionSize;
+    
+    // numbers of section in each second
+    private int sectionPerSec;
+    
     // nyquist frequency
     private int nyqFreq;
+    
+    private final int FRAME_PER_SECOND = 8000;
   
     
     /**
@@ -31,8 +36,9 @@ public class FFTCalculator {
      * 				each section, or the
      * 				window size
      */
-    public FFTCalculator(int sectionSize) {
+    public FFTCalculator(int sectionSize, int sectionPerSec) {
 	this.sectionSize = sectionSize;
+	this.sectionPerSec = sectionPerSec;
 	fftransformer = new DoubleFFT_1D(sectionSize);
 	sectionNum = 0;
 	nyqFreq = sectionSize / 2;
@@ -48,7 +54,7 @@ public class FFTCalculator {
 	double[][] fftArray = transform(sample);
 	
 	// hold power of whole samples
-	double[][] powerArray = new double[sectionSize][nyqFreq];
+	double[][] powerArray = new double[fftArray.length][nyqFreq];
 	
 	// hold maximum power in each section
 	double[] maxPower = new double[sectionSize];
@@ -106,37 +112,50 @@ public class FFTCalculator {
      */
     private double[][] transform(double[] sample) {
 	// the numbers of sections in sample
-	sectionNum = (int)Math.ceil((double)sample.length / sectionSize);
-	
+	//sectionNum = (int)Math.ceil((double)sample.length / sectionSize);
+	sectionNum = (int)Math.ceil((double)sample.length / 
+		FRAME_PER_SECOND * sectionPerSec);
+	int diff = sectionSize - 
+		(int)Math.floor((double)FRAME_PER_SECOND / sectionPerSec);
+	diff = (int)Math.floor((double)sectionPerSec * diff
+		/ (sectionPerSec - 1));
+
 	// the double array that is performing fft
 	double[][] fftArray = new double[sectionNum][sectionSize * 2];
-	
+
+	// index of the sample to put in temp array
+	int index = 0;
+
 	// put samples into fft array
 	for (int i = 0; i < fftArray.length; i++) {
 	    // transform samples in each section
 	    int length = fftArray[i].length;
-
+		    
 	    // temp array that holds sample split in section
 	    double[] temp = new double[length];
-
-	    // index of the sample to put in temp array
-	    int index = 0;
+	    
+	    if (i % (sectionPerSec - 1) == 0) {
+		index = i * 
+			(int)Math.floor((double)FRAME_PER_SECOND / sectionPerSec);
+	    }
+	    
 	    for (int j = 0; j < length; j += 2) {
-		temp[j] = sample[index];
+		double b = sample[index];
+		temp[j] = b;
 		temp[j + 1] = 0;
 		index++;
 		if (index >= sample.length) {
 		    break;
 		}
 	    }
-	    
+
 	    // perform fft
 	    fftransformer.complexForward(temp);
-	    for (int j = 0; j < temp.length; j++) {
-		fftArray[i][j] = temp[j];
+	    for (int k = 0; k < temp.length; k++) {
+		fftArray[i][k] = temp[k];
 	    }
-	    // reset index to 0
-	    index = 0;
+	    
+	    index -= diff;
 	}
 
 	return fftArray;

@@ -1,5 +1,7 @@
 package audioframe;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.sound.sampled.*;
 import javax.swing.JPanel;
@@ -42,8 +44,9 @@ public class Audio {
      * construct the graph view of this audio
      * @param power	power spectrum of the sample
      */
-    public void constructView(PowerSpectrum power) {
-	graphView = new AudioGraphView(getSample(), power);
+    public void constructView(PowerSpectrum power, 
+	    HashMap<Integer, ArrayList<Integer>> peak) {
+	graphView = new AudioGraphView(getSample(), power, peak);
     }
     
     /**
@@ -68,6 +71,14 @@ public class Audio {
      */
     public double[] getSample() {
 	return sample;
+    }
+    
+    /**
+     * return the graph view of the audio
+     * @return 	graph view of the audio
+     */
+    public JPanel getView() {
+	return graphView;
     }
     
     /**
@@ -107,14 +118,6 @@ public class Audio {
 	}
 	outputLine.close();
 
-    }
-    
-    /**
-     * return the graph view of the audio
-     * @return 	graph view of the audio
-     */
-    public JPanel getView() {
-	return graphView;
     }
     
     /**

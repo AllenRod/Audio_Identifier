@@ -3,6 +3,8 @@ package audioframe;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.*;
 
@@ -32,16 +34,18 @@ public class AudioGraphView extends JPanel {
      * @param maxAmp	maximum amplitude in the audio
      * @param spectrum	power spectrums of the audio
      */
-    public AudioGraphView(double[] sample, PowerSpectrum spectrum) {
+    public AudioGraphView(double[] sample, 
+	    PowerSpectrum spectrum, 
+	    HashMap<Integer, ArrayList<Integer>> peaks) {
 	super();
 	setLayout(new BorderLayout());
 	width = sample.length;
 	waveformView = new WaveformPanel(sample);
 	spectrogramView = new SpectrogramPanel(spectrum, 
-		null, sample.length);
-	setZoom(16.0);
+		peaks, sample.length);
 	add(waveformView, BorderLayout.NORTH);
 	add(spectrogramView, BorderLayout.CENTER);
+	setZoom(16.0);
     }
 
     /**
@@ -66,10 +70,22 @@ public class AudioGraphView extends JPanel {
      */
     public void setZoom(double horiz) {
 	hzoom = horiz;
-	width = (int)(width / hzoom);
-	int height = 100;
-	waveformView.setPreferredSize(new Dimension(width, height));
-	spectrogramView.setPreferredSize(new Dimension(width, height));
+	waveformView.setZoom(hzoom);
+	spectrogramView.setZoom(hzoom);
 	revalidate();
+    }
+    
+    /**
+     * zoom in or zoom out the graph view
+     * @param zoomIn	true for zoom in, false for zoom out
+     */
+    public void zoom(boolean zoomIn) {
+	if (zoomIn) {
+	    waveformView.setZoom(waveformView.getZoom() / 2);
+	    spectrogramView.setZoom(spectrogramView.getZoom() / 2);
+	} else {
+	    waveformView.setZoom(waveformView.getZoom() * 2);
+	    spectrogramView.setZoom(spectrogramView.getZoom() * 2);
+	}
     }
 }

@@ -1,6 +1,7 @@
 package audioframe;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Holds analyzed information and statistics
@@ -13,7 +14,7 @@ import java.util.ArrayList;
  */
 public class AudioAnalyser {
     // peaks extracted from the power spectrum
-    private ArrayList<Peak> peaks;
+    private HashMap<Integer, ArrayList<Integer>> peaks;
     
     // power spectrum of the audio
     private PowerSpectrum powerSpectrum;
@@ -34,7 +35,8 @@ public class AudioAnalyser {
      * create an AudioAnalyser object
      */
     public AudioAnalyser() {
-	fftCalculator = new FFTCalculator(1024);
+	fftCalculator = new FFTCalculator(1024, 10);
+	peakExtractor = new PeakExtractor(0.50);
     }
     
     /**
@@ -43,13 +45,14 @@ public class AudioAnalyser {
      */
     public void analyze(Audio audio) {
 	powerSpectrum = fftCalculator.calculatePower(audio.getSample());
+	peaks = peakExtractor.extractPeaks(powerSpectrum.getPower());
     }
     
     /**
-     * get an ArrayList of peaks from the audio
+     * get an HashMap of peaks from the audio
      * @return	list of peaks from the audio
      */
-    public ArrayList<Peak> getPeaks() {
+    public HashMap<Integer, ArrayList<Integer>> getPeaks() {
 	return peaks;
     }
     

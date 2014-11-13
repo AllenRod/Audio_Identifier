@@ -3,12 +3,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.*;
 
+import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Spectrogram of the audio.
@@ -24,8 +26,8 @@ public class SpectrogramPanel extends JPanel{
     // maximum power in each section
     private double[] maxPower;
     
-    // peaks of each section
-    private double[][] peaks;
+    // peaks of each section in HashMap
+    private HashMap<Integer, ArrayList<Integer>> peaks;
     
     // length of the sample
     private int length;
@@ -43,13 +45,14 @@ public class SpectrogramPanel extends JPanel{
      * 			to be drawn
      */
     public SpectrogramPanel(PowerSpectrum powerspectrums,
-	    ArrayList<Peak> peaks, int length) {
+	    HashMap<Integer, ArrayList<Integer>> peaks, int length) {
 	super();
 	powerSpectrums = powerspectrums.getPower();
 	maxPower = powerspectrums.getMaxPower();
+	this.peaks = peaks;
 	this.length = length;
     }
-    
+        
     /**
      * Get the horizontal zoom factor.
      * 
@@ -76,10 +79,9 @@ public class SpectrogramPanel extends JPanel{
 
 	double height = getHeight();
 	double width = getWidth();
-	double horizontalFactor = width / length;
+	double horizontalFactor = width / powerSpectrums.length;
 	double verticalFactor = height / powerSpectrums[0].length;
-
-
+	
 	double px = getX();
 	double py = getY();
 
@@ -88,12 +90,17 @@ public class SpectrogramPanel extends JPanel{
 	    double y = verticalFactor;
 
 	    for (int j = 0; j < powerSpectrums[i].length; j++) {
-		py = j * verticalFactor;
+		int k = powerSpectrums[i].length  - 1 - j;
+		py = k * verticalFactor;
 
 		// get color of rectangle
 		double rgbValue = powerSpectrums[i][j];
 		rgbValue = rgbValue * 255 / maxPower[i];
 		int value = (int) rgbValue;
+		value = value + 50;
+		if (value >= 255) {
+		    value = 255;
+		}
 		Color col = new Color(value, value, value);
 		g2.setColor(col);
 
@@ -101,6 +108,18 @@ public class SpectrogramPanel extends JPanel{
 		//g2.draw(new Rectangle2D.Double(px, py, x, y));
 		g2.fill(new Rectangle2D.Double(px, py, x, y));
 	    }
+	    
+	    // draw peaks
+	    g2.setColor(Color.RED);
+	    ArrayList<Integer> frequencies = peaks.get(i);
+	    Iterator<Integer> it = frequencies.iterator();
+	    while (it.hasNext()) {
+		int frequency = it.next();
+		int k = powerSpectrums[i].length  - 1 - frequency;
+		k *= verticalFactor;
+		g2.draw(new Line2D.Double(px, k, px, k));
+	    }
+	    
 	    px += x;
 	}
 
@@ -116,7 +135,7 @@ public class SpectrogramPanel extends JPanel{
     public void setZoom(double horiz) {
 	hzoom = horiz;
 	int width = (int)(length / hzoom);
-	int height = 100;
+	int height = 250;
 	setPreferredSize(new Dimension(width, height));
 	revalidate();
     }
