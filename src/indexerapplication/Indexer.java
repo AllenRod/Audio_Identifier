@@ -1,53 +1,94 @@
 package indexerapplication;
 
-import java.util.ArrayList;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import javax.swing.JOptionPane;
 
 /**
  * Indexer that is able to manage list of 
  * indexes.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 2
+ * CSE 260 PRJ 3
  * 10/25/14
  */
 public class Indexer {
-    // lists of indexes
-    private ArrayList<Index> indexes;
+    // current index
+    private Index index;
+    
+    // GUI of indexer
+    private IndexerGUI frame;
+    
     
     /**
      * create an Indexer object
      */
     public Indexer() {
-	
+	index = new Index();
+	frame = new IndexerGUI(this);
     }
     
     /**
-     * create and add a new index
+     * get the current index 
+     * @return		current index
      */
-    public void addIndex() {
-	
+    public Index getIndex() {
+	return index;
     }
     
     /**
-     * load an existing index from memory
+     * load an existing index from memory, the file is
+     * named index.dat
+     * @throws IOException 
      */
-    public void loadIndex() {
-	
+    public void loadIndex() throws IOException {
+	FileInputStream fin = null;
+	ObjectInputStream ois = null;
+	try {
+	    fin = new FileInputStream("index.dat");
+	    ois = new ObjectInputStream(fin);
+	    Object obj = ois.readObject();
+	    if (obj != null) {
+		index = (Index) obj;
+	    }
+	    JOptionPane.showMessageDialog(frame.getFrame(), "Load Success");
+	} catch (IOException e) {
+	    JOptionPane.showMessageDialog(frame.getFrame(), e.getMessage());
+	} catch (ClassNotFoundException e) {
+	    JOptionPane.showMessageDialog(frame.getFrame(), e.getMessage());
+	} finally {
+	    if (ois != null) {
+		ois.close();
+	    }
+	}
     }
     
     /**
-     * remove an existing index
-     * @param indexId	ID of the index
+     * save the index on memory, the file is named 
+     * index.dat
+     * @throws IOException 
      */
-    public void removeIndex(int indexID) {
-	
-    }
-    
-    /**
-     * save an existing index on memory
-     * @param indexID	ID of the index
-     */
-    public void saveIndex(int indexID) {
-	
+    public void saveIndex() throws IOException {
+	FileOutputStream fout = null;
+	ObjectOutputStream oos = null;
+	try {
+	    fout = new FileOutputStream("index.dat");
+	    oos = new ObjectOutputStream(fout);
+	    oos.writeObject(index);
+	    JOptionPane.showMessageDialog(frame.getFrame(), "Save Success");
+	} catch (FileNotFoundException e) {
+	    JOptionPane.showMessageDialog(frame.getFrame(), e.getMessage());
+	} catch (IOException e) {
+	    JOptionPane.showMessageDialog(frame.getFrame(), e.getMessage());
+	} finally {
+	    if (oos != null) {
+		oos.close();
+	    }
+	}
     }
 }

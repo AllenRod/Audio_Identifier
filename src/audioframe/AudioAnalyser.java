@@ -9,7 +9,7 @@ import java.util.HashMap;
  * to analyze the data from audio.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 2
+ * CSE 260 PRJ 3
  * 10/25/14
  */
 public class AudioAnalyser {
@@ -33,10 +33,25 @@ public class AudioAnalyser {
     
     /**
      * create an AudioAnalyser object
+     * @param sectionSize	number of samples per section
+     * @param sectionPerSec	number of section per second
+     * @param minPercentDiff	minimum percent difference
+     * @param timeDiff		time differences for ProbeExtractor
+     */
+    public AudioAnalyser(int sectionSize, int sectionPerSec,
+	    double minPercentDiff, int timeDiff) {
+	fftCalculator = new FFTCalculator(sectionSize, sectionPerSec);
+	peakExtractor = new PeakExtractor(minPercentDiff);
+	probeExtractor = new ProbeExtractor(timeDiff, sectionPerSec);
+    }
+    
+    /**
+     * create an AudioAnalyser with default parameter
      */
     public AudioAnalyser() {
 	fftCalculator = new FFTCalculator(1024, 10);
-	peakExtractor = new PeakExtractor(0.50);
+	peakExtractor = new PeakExtractor(0.80);
+	probeExtractor = new ProbeExtractor(1, 10);
     }
     
     /**
@@ -46,11 +61,14 @@ public class AudioAnalyser {
     public void analyze(Audio audio) {
 	powerSpectrum = fftCalculator.calculatePower(audio.getSample());
 	peaks = peakExtractor.extractPeaks(powerSpectrum.getPower());
+	probes = probeExtractor.extractProbe(peaks);
+	audio.constructView(getPowerSpectrum(), getPeaks());
+	audio.passStats(peakExtractor.getNum(), probes.size());
     }
     
     /**
      * get an HashMap of peaks from the audio
-     * @return	list of peaks from the audio
+     * @return	HashMap of peaks from the audio
      */
     public HashMap<Integer, ArrayList<Integer>> getPeaks() {
 	return peaks;

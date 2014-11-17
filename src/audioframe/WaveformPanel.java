@@ -11,7 +11,7 @@ import javax.swing.*;
  * 
  * @author Eugene W. Stark
  * @author Jiajie Li
- * CSE 260 PRJ 2
+ * CSE 260 PRJ 3
  * 10/25/14
  */
 public class WaveformPanel extends JPanel{
@@ -105,7 +105,7 @@ public class WaveformPanel extends JPanel{
     public void setZoom(double horiz) {
 	hzoom = horiz;
 	int width = (int)(length / hzoom);
-	int height = 250;
+	int height = 200;
 	setPreferredSize(new Dimension(width, height));
 	revalidate();
     }

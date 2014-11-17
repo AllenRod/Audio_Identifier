@@ -1,57 +1,35 @@
 package mainapplication;
-import javax.swing.*;
-import indexerapplication.Indexer;
 import clientapplication.Matcher;
+import indexerapplication.Indexer;
 
 /**
  * Main application that holds both client and indexer
  * applications. This class also constructs GUI objects.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 2
+ * CSE 260 PRJ 3
  * 10/25/14
  */
-public class MainApplication {
-    // indexer application
-    private Indexer indexer;
+public class MainApplication {  
+    // the indexer application
+    Indexer indexerApp;
     
-    // JPanel for indexer application
-    private JPanel indexerPanel;
-    
-    // client application
-    private Matcher matcher;
-    
-    // JPanel for matcher application
-    private JPanel matcherPanel;
+    // the matcher application
+    Matcher matchApp;
     
     /**
      * create a MainApplication object
-     * @param indexerApp	indexer application
-     * @param clientApp		client application
      */
-    public MainApplication(Indexer indexerApp, Matcher clientApp) {
-	
+    public MainApplication() {
+	indexerApp = new Indexer();
+	matchApp = new Matcher(indexerApp);
     }
     
     /**
-     * construct frame for main application
+     * main method of the program
      */
-    public void constructFrame() {
-	
-    }
-    
-    /**
-     * construct index application panel
-     */
-    public void constructIndexPanel() {
-	
-    }
-    
-    /**
-     * construct client application panel
-     */
-    public void constructClientPanel() {
-	
+    public static void main(String[] args) {
+	MainApplication audioIdentifier = new MainApplication();
     }
 
 }

@@ -1,5 +1,4 @@
 package indexerapplication;
-import javax.sound.sampled.AudioFormat;
 
 import audioframe.Audio;
 
@@ -8,7 +7,7 @@ import audioframe.Audio;
  * application. Extends from Audio.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 2
+ * CSE 260 PRJ 3
  * 10/25/14
  */
 public class AudioTrack extends Audio{
@@ -21,8 +20,16 @@ public class AudioTrack extends Audio{
      * @param format	format of the audio track
      * @param sample	sample of the audio track
      */
-    public AudioTrack(int trackID, AudioFormat format,
-	    double[] sample) {
-	super(format, sample);
+    public AudioTrack(int trackID, Audio audio) {
+	super(audio.getFormat(), audio.getSample());
+	this.trackID = trackID;
+    }
+    
+    /**
+     * get the track ID of the track
+     * @return		ID of the track
+     */
+    public int getTrackID() {
+	return trackID;
     }
 }

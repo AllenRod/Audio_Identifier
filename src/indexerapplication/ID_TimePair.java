@@ -1,25 +1,29 @@
 package indexerapplication;
+
+import java.io.Serializable;
+
 /**
  * Pair of trackID and time as values in ProbeMap.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 2
+ * CSE 260 PRJ 3
  * 10/25/14
  */
-public class ID_TimePair {
+public class ID_TimePair implements Serializable{
     // ID of track which probe occurs
     private int trackID;
 
     // time of probe first occurrence
-    private double time;
+    private int occurTime;
 
     /**
      * create a ID_TimePair object
-     * @param trackID	ID of track
-     * @param time		time of occurrence
+     * @param trackID		ID of track
+     * @param occurTime		time of occurrence
      */
-    public ID_TimePair(int trackID, double time) {
-
+    public ID_TimePair(int trackID, int occurTime) {
+	this.trackID = trackID;
+	this.occurTime = occurTime;
     }
 
     /**
@@ -34,7 +38,7 @@ public class ID_TimePair {
      * get time from the pair
      * @return	time
      */
-    public double getTime() {
-	return time;
+    public int getOccurTime() {
+	return occurTime;
     }
 }

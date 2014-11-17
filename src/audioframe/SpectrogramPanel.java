@@ -16,7 +16,7 @@ import java.util.Iterator;
  * Spectrogram of the audio.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 2
+ * CSE 260 PRJ 3
  * 10/25/14
  */
 public class SpectrogramPanel extends JPanel{
@@ -113,11 +113,12 @@ public class SpectrogramPanel extends JPanel{
 	    g2.setColor(Color.RED);
 	    ArrayList<Integer> frequencies = peaks.get(i);
 	    Iterator<Integer> it = frequencies.iterator();
+	    double lx = px + horizontalFactor / 2;
 	    while (it.hasNext()) {
 		int frequency = it.next();
-		int k = powerSpectrums[i].length  - 1 - frequency;
-		k *= verticalFactor;
-		g2.draw(new Line2D.Double(px, k, px, k));
+		double ly = powerSpectrums[i].length  - 1 - frequency;
+		ly *= verticalFactor;
+		g2.draw(new Line2D.Double(lx, ly, lx, ly));
 	    }
 	    
 	    px += x;
@@ -135,7 +136,7 @@ public class SpectrogramPanel extends JPanel{
     public void setZoom(double horiz) {
 	hzoom = horiz;
 	int width = (int)(length / hzoom);
-	int height = 250;
+	int height = 200;
 	setPreferredSize(new Dimension(width, height));
 	revalidate();
     }

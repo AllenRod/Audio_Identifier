@@ -1,7 +1,6 @@
 package audioframe;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +11,7 @@ import javax.swing.*;
  * The graph view of the audio.
  * 
  * @author Jiajie Li 
- * CSE 260 PRJ 2 
+ * CSE 260 PRJ 3 
  * 10/25/14
  */
 public class AudioGraphView extends JPanel {
@@ -25,9 +24,6 @@ public class AudioGraphView extends JPanel {
     // spectrogram view of the audio
     private SpectrogramPanel spectrogramView;
     
-    // width of the panel
-    private int width;
-    
     /**
      * create an AudioGraphView object
      * @param sample	sample of the audio
@@ -39,7 +35,6 @@ public class AudioGraphView extends JPanel {
 	    HashMap<Integer, ArrayList<Integer>> peaks) {
 	super();
 	setLayout(new BorderLayout());
-	width = sample.length;
 	waveformView = new WaveformPanel(sample);
 	spectrogramView = new SpectrogramPanel(spectrum, 
 		peaks, sample.length);
@@ -58,8 +53,6 @@ public class AudioGraphView extends JPanel {
 	super.paintComponent(g);
 	waveformView.paintComponent(g);
 	spectrogramView.paintComponent(g);
-	revalidate();
-	repaint();
     }
 
     /**
@@ -72,7 +65,6 @@ public class AudioGraphView extends JPanel {
 	hzoom = horiz;
 	waveformView.setZoom(hzoom);
 	spectrogramView.setZoom(hzoom);
-	revalidate();
     }
     
     /**

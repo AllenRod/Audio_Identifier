@@ -4,7 +4,7 @@ package audioframe;
  * Power spectrums of all samples.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 2
+ * CSE 260 PRJ 3
  * 10/25/14
  */
 public class PowerSpectrum {
@@ -58,5 +58,13 @@ public class PowerSpectrum {
      */
     public double[][] getPower() {
 	return power;
+    }
+    
+    /**
+     * get section size
+     * @return	section size
+     */
+    public int getSectionSize() {
+	return sectionSize;
     }
 }

@@ -12,36 +12,46 @@ import javax.swing.JPanel;
  * 
  * @author Eugene W. Stark
  * @author Jiajie Li
- * CSE 260 PRJ 2
+ * CSE 260 PRJ 3
  * 10/25/14
  */
 
-public class Audio {
+public class Audio implements Serializable{
     // duration of the audio
-    private double duration;
+    private int duration;
     
     // format of the audio
-    private AudioFormat format;
-    
-    // array of double of samples in the audio
-    private double[] sample;
+    private transient AudioFormat format;
     
     // graph view of the audio
     private JPanel graphView;
     
+    // number of peaks
+    private int peakSize;
+    
+    // number of probes
+    private int probeSize;
+    
+    // array of double of samples in the audio
+    private double[] sample;
+    
+    
     /**
-     * create an AudioClip object
+     * create an Audio object
      * @param format	format of the audio 
      * @param sample	sample of the audio 
      */
     public Audio(AudioFormat format, double[] sample) {
 	this.format = format;
 	this.sample = sample;
-	duration = (double)size() / 8000;
+	duration = size() / 8000;
+	peakSize = 0;
+	probeSize = 0;
     }
     
     /**
-     * construct the graph view of this audio
+     * construct the graph view of this audio, called by
+     * AudioAnalyser
      * @param power	power spectrum of the sample
      */
     public void constructView(PowerSpectrum power, 
@@ -53,7 +63,7 @@ public class Audio {
      * get the duration of the audio 
      * @return	duration of the audio 
      */
-    public double getDuration() {
+    public int getDuration() {
 	return duration;
     }
     
@@ -63,6 +73,22 @@ public class Audio {
      */
     public AudioFormat getFormat() {
 	return format;
+    }
+    
+    /**
+     * get the number of peaks
+     * @return	number of peaks
+     */
+    public int getPeakNum() {
+	return peakSize;
+    }
+    
+    /**
+     * get the number of probes
+     * @return	number of probes
+     */
+    public int getProbeNum() {
+	return probeSize;
     }
     
     /**
@@ -79,6 +105,16 @@ public class Audio {
      */
     public JPanel getView() {
 	return graphView;
+    }
+    
+    /**
+     * receive stats from AudioAnalyser
+     * @param peakSize		number of peaks
+     * @param probeSize		number of probes
+     */
+    public void passStats(int peakSize, int probeSize) {
+	this.peakSize = peakSize;
+	this.probeSize = probeSize;
     }
     
     /**

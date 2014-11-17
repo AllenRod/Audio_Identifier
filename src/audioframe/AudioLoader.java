@@ -10,7 +10,7 @@ import javax.swing.*;
  * Loader that loads audio file
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 2
+ * CSE 260 PRJ 3
  * 10/25/14
  */
 public class AudioLoader {

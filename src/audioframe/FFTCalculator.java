@@ -7,7 +7,7 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
  * signal.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 2
+ * CSE 260 PRJ 3
  * 10/25/14
  */
 public class FFTCalculator {
@@ -26,7 +26,8 @@ public class FFTCalculator {
     // nyquist frequency
     private int nyqFreq;
     
-    private final int FRAME_PER_SECOND = 8000;
+    // frame rate of the audio
+    private final double FRAME_PER_SECOND = 8000.0;
   
     
     /**
@@ -57,9 +58,9 @@ public class FFTCalculator {
 	double[][] powerArray = new double[fftArray.length][nyqFreq];
 	
 	// hold maximum power in each section
-	double[] maxPower = new double[sectionSize];
+	double[] maxPower = new double[fftArray.length];
 	for (int i = 0; i < maxPower.length; i++) {
-	    maxPower[i] = Double.MIN_NORMAL;
+	    maxPower[i] = Double.MIN_VALUE;
 	}
 	
 	// calculate the power
