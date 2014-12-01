@@ -46,7 +46,7 @@ public class AudioAnalyser {
      */
     public AudioAnalyser() {
 	fftCalculator = new FFTCalculator(1024, 10);
-	peakExtractor = new PeakExtractor(0.85);
+	peakExtractor = new PeakExtractor(0.92);
 	probeExtractor = new ProbeExtractor(1, 10, 1024);
     }
     

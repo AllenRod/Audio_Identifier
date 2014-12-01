@@ -34,7 +34,7 @@ public class ProbeExtractor {
 	    int sectionSize) {
 	this.timeDiff = timeDiff;
 	this.sectionPerSec = sectionPerSec;
-	freqDiff = (int) (sectionSize * (0.20));
+	freqDiff = (int) (sectionSize * (0.15));
     }
     
     /**
