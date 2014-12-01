@@ -7,21 +7,18 @@ import java.util.HashMap;
  * The extractor that extracts probes from
  * peaks
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
-public class ProbeExtractor {
-    //probe extracted from the audio
-    ArrayList<Probe> probes;
+public class ProbeExtractor {   
+    // minimum difference between frequencies
+    private int freqDiff;
     
-    // size of each index
-    private int timeDiff;
-
     // number of sections per second
     private int sectionPerSec;
     
-    // frame rate of the audio
-    private final int FRAME_PER_SECOND = 8000;
+    // size of each index
+    private int timeDiff;
 
     /**
      * 
@@ -31,11 +28,13 @@ public class ProbeExtractor {
      * 				to extract the probes
      * @param sectionPerSec	number of sections per second,
      * 				used to calculate the time
+     * @param sectionSize	size of each section
      */
-    public ProbeExtractor(int timeDiff, int sectionPerSec) {
-	probes = new ArrayList<>();
+    public ProbeExtractor(int timeDiff, int sectionPerSec, 
+	    int sectionSize) {
 	this.timeDiff = timeDiff;
 	this.sectionPerSec = sectionPerSec;
+	freqDiff = (int) (sectionSize * (0.20));
     }
     
     /**
@@ -44,9 +43,8 @@ public class ProbeExtractor {
      */
     public ArrayList<Probe> extractProbe(
 	    HashMap<Integer, ArrayList<Integer>> peaks) {
-	if (!probes.isEmpty()) {
-	    probes.clear();
-	}
+	//probe extracted from the audio
+	ArrayList<Probe> probes = new ArrayList<>();
 	
 	// array of the sections
 	Integer[] sections = peaks.keySet().toArray(new Integer[0]);
@@ -72,8 +70,9 @@ public class ProbeExtractor {
 		    for (Integer peak2 : peaks.get(sections[i] + j)) {
 			int freq2 = peak2;
 			
-			if (Math.abs(freq2 - freq1) > 10) {
-			    probes.add(new Probe(time1, time2, freq1, freq2));
+			if (Math.abs(freq2 - freq1) > freqDiff) {
+			    probes.add(new Probe(time1, time2, 
+				    freq1, freq2));
 			}
 		    }
 		}
@@ -87,8 +86,8 @@ public class ProbeExtractor {
      * @param sectionIndex	index of section
      * @return			time of occurrence in seconds
      */
-    public int getTime(int sectionIndex) {
-	int time = sectionIndex * FRAME_PER_SECOND / sectionPerSec;
+    private int getTime(int sectionIndex) {
+	int time = sectionIndex / sectionPerSec;
 	return time;
     }
     

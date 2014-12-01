@@ -1,7 +1,9 @@
 package indexerapplication;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import audioframe.Probe;
@@ -12,43 +14,32 @@ import audioframe.Probe;
  * HashMap.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
-public class ProbeMap extends HashMap<Probe, ID_TimePair>{      
+public class ProbeMap extends HashMap<Probe, ArrayList<ID_TimePair>> {      
     /**
      * create a ProbeMap object
      */
     public ProbeMap() {
 	super();
     }
-    
+
     /**
-     * construct an array of ID_TimePair and return it
-     * @return		an array of ID_TimePair
+     * put the pair in the list of the HashMap as value
+     * @param key	the key of the mapping
+     * @param pair	the pair to be added as the values
      */
-    public ID_TimePair[] getPairs() {
-	ID_TimePair[] pairArray = new ID_TimePair[this.size()];
-	int index = 0;
-	for (Map.Entry<Probe, ID_TimePair> entry : this.entrySet()) {
-	    pairArray[index] = entry.getValue();
-	    index++;
+    public void putInList(Probe key, ID_TimePair pair) {
+	if (containsKey(key)) {
+	    ArrayList<ID_TimePair> oldList = get(key);
+	    oldList.add(pair);
+	    put(key, oldList);
+	} else {
+	    ArrayList<ID_TimePair> list = new ArrayList<>();
+	    list.add(pair);
+	    put(key, list);
 	}
-	return pairArray;
-    }
-    
-    /**
-     * construct an array of Probe and return it
-     * @return		an array of Probe
-     */
-    public Probe[] getProbes() {
-	Probe[] probeArray = new Probe[this.size()];
-	int index = 0;
-	for (Map.Entry<Probe, ID_TimePair> entry : this.entrySet()) {
-	    probeArray[index] = entry.getKey();
-	    index++;
-	}
-	return probeArray;
     }
     
     /**
@@ -58,7 +49,15 @@ public class ProbeMap extends HashMap<Probe, ID_TimePair>{
      * @return		ID_TimePair that is removed
      * 			from the map
      */
-    public ID_TimePair removeByID(int trackID) {
-	return null;
+    public void removeByID(int trackID) {
+	for (Map.Entry<Probe, ArrayList<ID_TimePair>> entry : entrySet()) {
+	    Iterator<ID_TimePair> list = entry.getValue().iterator();
+	    while (list.hasNext()) {
+		ID_TimePair pair = list.next();
+		if (pair.getTrackID() == trackID) {
+		    list.remove();
+		}
+	    }
+	}
     }
 }

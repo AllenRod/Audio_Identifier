@@ -15,12 +15,12 @@ import audioframe.Probe;
  * trackID and time pair.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
 public class Index implements Serializable{    
     // list of folders
-    private ArrayList<Folder> folders;
+    //private ArrayList<Folder> folders;
     
     // probe map that takes probes as keys and 
     // trackID and time pair as values
@@ -39,7 +39,7 @@ public class Index implements Serializable{
      * create an Index object
      */
     public Index() {
-	folders = new ArrayList<>();
+	//folders = new ArrayList<>();
 	probeMap = new ProbeMap();
 	currentID = 0;
 	size = 0;
@@ -70,9 +70,8 @@ public class Index implements Serializable{
 	    tracks.add(track);
 	    currentID++;
 	    size++;
-	    return track;
 	}
-	return null;
+	return track;
     }
     
     /**
@@ -81,7 +80,7 @@ public class Index implements Serializable{
      * @return			if the index has the track
      */
     private boolean hasTrack(int trackID) {
-	if (trackID < 0 || trackID > size) {
+	if (trackID < 0) {
 	    return false;
 	}
 	return true;
@@ -112,7 +111,14 @@ public class Index implements Serializable{
 	if (!hasTrack(trackID)) {
 	    return null;
 	}
-	return tracks.get(trackID);
+	Iterator<AudioTrack> it = tracks.iterator();
+	while (it.hasNext()) {
+	    AudioTrack thisTrack = it.next();
+	    if (thisTrack.getTrackID() == trackID) {
+		return thisTrack;
+	    }
+	}
+	return null;
     }
       
     /**
@@ -128,7 +134,7 @@ public class Index implements Serializable{
 		@Override
 		public Object doInBackground() {
 		    try {
-			playTrack.play();
+			playTrack.play(0, playTrack.getDuration());
 		    } 
 		    catch (Exception e){
 			System.out.println(e.getMessage());
@@ -158,7 +164,7 @@ public class Index implements Serializable{
 	    Probe current = it.next();
 	    ID_TimePair pair = 
 		    new ID_TimePair(track.getTrackID(), current.getOccurTime());
-	    probeMap.put(current, pair);
+	    probeMap.putInList(current, pair);
 	}
     }
     
@@ -172,10 +178,17 @@ public class Index implements Serializable{
 	if (!hasTrack(trackID)) {
 	    return false;
 	}
-	if (tracks.remove(trackID) != null) {
-	    size--;
+	Iterator<AudioTrack> it = tracks.iterator();
+	while (it.hasNext()) {
+	    AudioTrack thisTrack = it.next();
+	    if (thisTrack.getTrackID() == trackID) {
+		it.remove();
+		probeMap.removeByID(trackID);
+		size--;
+		return true;
+	    }
 	}
-	return true;
+	return false;
     }
     
     /**
@@ -185,7 +198,7 @@ public class Index implements Serializable{
      * @author Jiajie Li
      * CSE 260 PRJ 3
      * 10/25/14
-     */
+     *
     class Folder {
 	// audio tracks that are loaded into the folder
 	private ArrayList<AudioTrack> folderTracks;
@@ -199,7 +212,7 @@ public class Index implements Serializable{
 	/**
 	 * create a folder with the name
 	 * @param String	name of the folder
-	 */
+	 *
 	public Folder(String name) {
 	    folderTracks = new ArrayList<>();
 	    folderSize = 0;
@@ -209,7 +222,7 @@ public class Index implements Serializable{
 	/**
 	 * load and add a track into the folder, add
 	 * to the index as well
-	 */
+	 *
 	public void addTrack(AudioTrack track) {
 	    folderTracks.add(track);
 	    folderSize++;
@@ -219,9 +232,9 @@ public class Index implements Serializable{
 	 * remove the track with the given track ID
 	 * @param trackID	ID of the track that needs
 	 * 			to be removed
-	 */
+	 *
 	public void removeTrack(int trackID) {
 	    
 	}
-    }
+    }*/
 }

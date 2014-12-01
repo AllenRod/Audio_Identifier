@@ -7,7 +7,7 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
  * signal.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
 public class FFTCalculator {

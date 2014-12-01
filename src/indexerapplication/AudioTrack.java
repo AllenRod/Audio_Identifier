@@ -7,7 +7,7 @@ import audioframe.Audio;
  * application. Extends from Audio.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
 public class AudioTrack extends Audio{
@@ -21,7 +21,7 @@ public class AudioTrack extends Audio{
      * @param sample	sample of the audio track
      */
     public AudioTrack(int trackID, Audio audio) {
-	super(audio.getFormat(), audio.getSample());
+	super(audio.getFormat(), audio.getSample(), audio.getName());
 	this.trackID = trackID;
     }
     

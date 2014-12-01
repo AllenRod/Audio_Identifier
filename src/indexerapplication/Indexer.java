@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
  * indexes.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
 public class Indexer {
@@ -44,19 +44,23 @@ public class Indexer {
     /**
      * load an existing index from memory, the file is
      * named index.dat
+     * @param fileName		path of file
      * @throws IOException 
+     * @return 			the loading process is success or not
      */
-    public void loadIndex() throws IOException {
+    public boolean loadIndex(String fileName) throws IOException {
 	FileInputStream fin = null;
 	ObjectInputStream ois = null;
+	boolean loaded = false;
 	try {
-	    fin = new FileInputStream("index.dat");
+	    fin = new FileInputStream(fileName);
 	    ois = new ObjectInputStream(fin);
 	    Object obj = ois.readObject();
 	    if (obj != null) {
 		index = (Index) obj;
 	    }
 	    JOptionPane.showMessageDialog(frame.getFrame(), "Load Success");
+	    loaded = true;
 	} catch (IOException e) {
 	    JOptionPane.showMessageDialog(frame.getFrame(), e.getMessage());
 	} catch (ClassNotFoundException e) {
@@ -66,18 +70,20 @@ public class Indexer {
 		ois.close();
 	    }
 	}
+	return loaded;
     }
     
     /**
      * save the index on memory, the file is named 
      * index.dat
+     * @param fileName		path of file
      * @throws IOException 
      */
-    public void saveIndex() throws IOException {
+    public void saveIndex(String fileName) throws IOException {
 	FileOutputStream fout = null;
 	ObjectOutputStream oos = null;
 	try {
-	    fout = new FileOutputStream("index.dat");
+	    fout = new FileOutputStream(fileName);
 	    oos = new ObjectOutputStream(fout);
 	    oos.writeObject(index);
 	    JOptionPane.showMessageDialog(frame.getFrame(), "Save Success");
@@ -90,5 +96,12 @@ public class Indexer {
 		oos.close();
 	    }
 	}
+    }
+    
+    /**
+     * main method of the program
+     */
+    public static void main(String[] args) {
+	Indexer indexerApp = new Indexer();
     }
 }

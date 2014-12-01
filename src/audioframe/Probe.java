@@ -7,7 +7,7 @@ import java.io.Serializable;
  * frequency2) in each audio.
  * 
  * @author Jiajie Li
- * CSE 220 PRJ 3
+ * CSE 220 PRJ 4
  * 10/25/14
  */
 public class Probe implements Serializable{
@@ -23,7 +23,6 @@ public class Probe implements Serializable{
     // time difference
     private int timeDiff;
     
-    private final int FRAME_PER_SECOND = 8000;
     
     /**
      * 
@@ -36,27 +35,32 @@ public class Probe implements Serializable{
     public Probe(int time1, int time2, int freq1, int freq2) {
 	this.freq1 = freq1;
 	this.freq2 = freq2;
-	occurTime = time1 / FRAME_PER_SECOND;
+	occurTime = time1;
 	timeDiff = time2 - time1;
     }
     
+    @Override
     /**
      * compare this probe with another probe
      * @param other	other probe to be compared
      * @return		true if two probes have the
      * 			same (t2 - t1, f1, f2) triple
      */
-    public boolean compareTo(Probe other) {
-	if (this == other) {
+    public boolean equals(Object obj) {
+	if (this == obj) {
 	    return true;
 	}
-	if (this.getFreq1() != other.getFreq1()) {
+	if (obj.getClass() != this.getClass()) {
+	    return false;	    
+	}
+	Probe other = (Probe)obj;
+	if (freq1 != other.getFreq1()) {
 	    return false;
 	} 
-	if (this.getFreq2() != other.getFreq2()) {
+	if (freq2 != other.getFreq2()) {
 	    return false;
 	}
-	if (this.getTimeDiff() != other.getTimeDiff()) {
+	if (timeDiff != other.getTimeDiff()) {
 	    return false;
 	}
 	return true;
@@ -94,14 +98,15 @@ public class Probe implements Serializable{
 	return timeDiff;
     }
     
+    @Override
     /**
      * compute the hash code of this object, override method
      * in Object
      * @return		hash code of this object
      */
     public int hashCode() {
-	int code  = freq1 * 1013 + freq2 * 31;
-	code += timeDiff * 7 + occurTime;
+	int code  = freq1 * 97 + freq2 * 31 +
+		timeDiff * 17;
 	return code;
     }
 }

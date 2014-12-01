@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Pair of trackID and time as values in ProbeMap.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
 public class ID_TimePair implements Serializable{

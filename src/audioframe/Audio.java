@@ -12,7 +12,7 @@ import javax.swing.JPanel;
  * 
  * @author Eugene W. Stark
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
 
@@ -24,7 +24,10 @@ public class Audio implements Serializable{
     private transient AudioFormat format;
     
     // graph view of the audio
-    private JPanel graphView;
+    private transient JPanel graphView;
+    
+    // name of the track
+    private String name;
     
     // number of peaks
     private int peakSize;
@@ -33,18 +36,21 @@ public class Audio implements Serializable{
     private int probeSize;
     
     // array of double of samples in the audio
-    private double[] sample;
+    private transient double[] sample;
     
+    // frame size
+    private transient final int FRAME_SIZE = 8000;
     
     /**
      * create an Audio object
      * @param format	format of the audio 
      * @param sample	sample of the audio 
      */
-    public Audio(AudioFormat format, double[] sample) {
+    public Audio(AudioFormat format, double[] sample, String name) {
 	this.format = format;
+	this.name = name;
 	this.sample = sample;
-	duration = size() / 8000;
+	duration = size() / FRAME_SIZE;
 	peakSize = 0;
 	probeSize = 0;
     }
@@ -73,6 +79,14 @@ public class Audio implements Serializable{
      */
     public AudioFormat getFormat() {
 	return format;
+    }
+    
+    /**
+     * get the name of the audio file
+     * @return	name of the audio file
+     */
+    public String getName() {
+	return name;
     }
     
     /**
@@ -128,14 +142,15 @@ public class Audio implements Serializable{
     /**
      * Play this audio over the audio output device.
      *
-     * @param format The audio format to use to encode the data.
+     * @param off	 the offset from the beginning of audio
+     * @param len	 the duration to be played
      * @throws UnsupportedAudioFileException if the specified format is not
      * supported on this platform.
      * @throws LineUnavailableException if no audio line can be obtained
      * to play the audio.
      * @throws IOException if there is an error while playing the audio.
      */
-    public void play()
+    public void play(int off, int len)
 	    throws UnsupportedAudioFileException, LineUnavailableException,
 	    IOException {
 	AudioInputStream ain = toStream();
@@ -144,8 +159,21 @@ public class Audio implements Serializable{
 	outputLine.start();
 	byte[] buf = new byte[1024];
 	int n;
-	while((n = ain.read(buf)) != -1)
-	    outputLine.write(buf, 0, n);
+	if (off > 0)
+	    ain.skip(off * 2 * FRAME_SIZE);
+	if (len >= duration) {
+	    while((n = ain.read(buf)) != -1) 
+		outputLine.write(buf, 0, n);
+	} else {
+	    int played = 0;
+	    while ((n = ain.read(buf)) != -1) {
+		played += n;
+		if (played >= len * 2 * FRAME_SIZE) {
+		    break;
+		}
+		outputLine.write(buf, 0, n);
+	    }
+	}
 	outputLine.drain();
 	try {
 	    Thread.sleep(1000);
@@ -205,7 +233,7 @@ public class Audio implements Serializable{
 	    v /= channels;
 	    samples[i] = v;
 	}
-	return new Audio(newformat, samples);
+	return new Audio(newformat, samples, name);
     }
     
     /**

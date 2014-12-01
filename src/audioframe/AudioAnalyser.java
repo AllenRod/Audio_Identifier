@@ -9,16 +9,11 @@ import java.util.HashMap;
  * to analyze the data from audio.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
 public class AudioAnalyser {
-    // peaks extracted from the power spectrum
-    private HashMap<Integer, ArrayList<Integer>> peaks;
-    
-    // power spectrum of the audio
-    private PowerSpectrum powerSpectrum;
-    
+     
     // probes extracted from the audio
     private ArrayList<Probe> probes;
     
@@ -42,7 +37,8 @@ public class AudioAnalyser {
 	    double minPercentDiff, int timeDiff) {
 	fftCalculator = new FFTCalculator(sectionSize, sectionPerSec);
 	peakExtractor = new PeakExtractor(minPercentDiff);
-	probeExtractor = new ProbeExtractor(timeDiff, sectionPerSec);
+	probeExtractor = new ProbeExtractor(timeDiff, 
+		sectionPerSec, sectionSize);
     }
     
     /**
@@ -50,8 +46,8 @@ public class AudioAnalyser {
      */
     public AudioAnalyser() {
 	fftCalculator = new FFTCalculator(1024, 10);
-	peakExtractor = new PeakExtractor(0.80);
-	probeExtractor = new ProbeExtractor(1, 10);
+	peakExtractor = new PeakExtractor(0.90);
+	probeExtractor = new ProbeExtractor(3, 10, 1024);
     }
     
     /**
@@ -59,27 +55,14 @@ public class AudioAnalyser {
      * @param audio	audio to be analyzed
      */
     public void analyze(Audio audio) {
-	powerSpectrum = fftCalculator.calculatePower(audio.getSample());
-	peaks = peakExtractor.extractPeaks(powerSpectrum.getPower());
+	// power spectrum of the audio
+	PowerSpectrum powerSpectrum = fftCalculator.calculatePower(audio.getSample());
+	
+	// peaks extracted from the power spectrum
+	HashMap<Integer, ArrayList<Integer>> peaks = peakExtractor.extractPeaks(powerSpectrum.getPower());
 	probes = probeExtractor.extractProbe(peaks);
-	audio.constructView(getPowerSpectrum(), getPeaks());
+	audio.constructView(powerSpectrum, peaks);
 	audio.passStats(peakExtractor.getNum(), probes.size());
-    }
-    
-    /**
-     * get an HashMap of peaks from the audio
-     * @return	HashMap of peaks from the audio
-     */
-    public HashMap<Integer, ArrayList<Integer>> getPeaks() {
-	return peaks;
-    }
-    
-    /**
-     * get power spectrum of the audio
-     * @return	power spectrum of the audio
-     */
-    public PowerSpectrum getPowerSpectrum() {
-	return powerSpectrum;
     }
 
     /**

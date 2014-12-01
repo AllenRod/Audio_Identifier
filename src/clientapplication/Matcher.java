@@ -1,8 +1,9 @@
 package clientapplication;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
@@ -11,14 +12,16 @@ import audioframe.Audio;
 import audioframe.AudioAnalyser;
 import audioframe.AudioLoader;
 import audioframe.Probe;
-import indexerapplication.Indexer;
+import indexerapplication.AudioTrack;
+import indexerapplication.ID_TimePair;
+import indexerapplication.Index;
 import indexerapplication.ProbeMap;
 
 /**
  * The match application that match the clip.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 11/16/14
  */
 public class Matcher {
@@ -28,14 +31,11 @@ public class Matcher {
     // the clip analyzer
     private AudioAnalyser clipAnalyser;
     
-    // indexer from indexer application
-    private Indexer indexer;
+    // index from indexer application
+    private Index index;
     
     // the GUI frame of the application
     private MatcherGUI matcherGUI;
-    
-    // the ArrayList for matching purpose
-    private HashMap<ID_TimeDiffPair, Integer> matchMap;
     
     // probes extracted from the clip to be compared
     private ArrayList<Probe> probes;
@@ -45,14 +45,12 @@ public class Matcher {
     
     /**
      * create a Matcher object
-     * @param indexer	the indexer application
      */
-    public Matcher(Indexer indexer) {
+    public Matcher() {
 	clip = null;
 	clipAnalyser = new AudioAnalyser();
-	this.indexer = indexer;
+	index = null;
 	matcherGUI = new MatcherGUI(this);
-	matchMap = new HashMap<>();
     }
     
     /**
@@ -61,6 +59,14 @@ public class Matcher {
      */
     public Audio getClip() {
 	return clip;
+    }
+    
+    /**
+     * get the index from the application
+     * @return		the index from application
+     */
+    public Index getIndex() {
+	return index;
     }
     
     /**
@@ -79,51 +85,99 @@ public class Matcher {
     }
     
     /**
-     * match the clip with the tracks in indexer application
+     * load an existing index from memory, the file is
+     * named index.dat
+     * @param fileName		path of file
+     * @throws IOException 
+     * @return 			if the load process succeed or not
      */
-    public void match() {
-	matchMap.clear();
+    public boolean loadIndex(String fileName) throws IOException {
+	FileInputStream fin = null;
+	ObjectInputStream ois = null;
+	boolean loaded = false;
+	try {
+	    fin = new FileInputStream(fileName);
+	    ois = new ObjectInputStream(fin);
+	    Object obj = ois.readObject();
+	    if (obj != null) {
+		index = (Index) obj;
+	    }
+	    JOptionPane.showMessageDialog(matcherGUI.getFrame(),
+		    "Load Success");
+	    loaded = true;
+	} catch (IOException e) {
+	    JOptionPane.showMessageDialog(matcherGUI.getFrame(), 
+		    e.getMessage());
+	} catch (ClassNotFoundException e) {
+	    JOptionPane.showMessageDialog(matcherGUI.getFrame(), 
+		    e.getMessage());
+	} finally {
+	    if (ois != null) {
+		ois.close();
+	    }
+	}
+	return loaded;
+    }
+    
+    /**
+     * match the clip with the tracks in indexer application
+     * @return 		the result of matching in table format
+     */
+    public Object[][] match() {
+	if (index == null) {
+	    JOptionPane.showMessageDialog(matcherGUI.getFrame(), 
+		    "No index loaded. Please load an index.");
+	    return null;
+	}
 	
-	int hits = 0;
-	int hitsID = 0;
-	int diff = 0;
+	// create a HitCounter object
+	HitCounter counter = new HitCounter();
 	
 	// get the probe map and probes from indexer application
-	probeMap = indexer.getIndex().getProbeMap();
-	Probe[] indexerProbes = probeMap.getProbes();
+	probeMap = index.getProbeMap();
+	
 	// iterates through the probes from matcher application
 	Iterator<Probe> it = probes.iterator();
 	while (it.hasNext()) {
 	    Probe current = it.next();
 	    
-	    // iterates through the probes from indexer application
-	    for (int i = 0; i < indexerProbes.length; i++) {
-		if (current.compareTo(indexerProbes[i])) {
-		    int trackID = probeMap.get(indexerProbes[i]).getTrackID();
-		    int currentTime = current.getOccurTime();
-		    int trackTime = probeMap.get(indexerProbes[i]).getOccurTime();
-		    int timeDiff;
-		    if (trackTime >= currentTime) {
-			timeDiff = trackTime - currentTime;
-		    } else {
-			timeDiff = currentTime - trackTime;
-		    }
-		    ID_TimeDiffPair pair = new ID_TimeDiffPair(trackID, timeDiff);
-		    if (!matchMap.containsKey(pair)) {
-			matchMap.put(pair, 1);
-		    } else {
-			int num = matchMap.get(pair);
-			if (num + 1 >= hits) {
-			    hits = num + 1;
-			    hitsID = trackID;
-			    diff = timeDiff;
-			}
-			matchMap.put(pair, num + 1);
-		    }
-		}
+	    // get a list of occurred track ID and time
+	    ArrayList<ID_TimePair> list = probeMap.get(current);
+	    if (list == null) {
+		continue;
 	    }
+	    
+	    // iterates through the pairs from indexer application
+	    Iterator<ID_TimePair> listIt = list.iterator();
+	    while (listIt.hasNext()) {
+		ID_TimePair pair = listIt.next();
+		ID_DeltaPair countPair = 
+			new ID_DeltaPair(pair.getTrackID(), 
+				current.getOccurTime(), 
+				pair.getOccurTime());
+		counter.hit(countPair);
+	    }
+	  
 	}	
-	reportMatchResult(hits, hitsID, diff);
+	
+	ID_DeltaPair[] result = counter.sortHits();
+	Object[][] report = new Object[10][4];
+	for (int i = 0; i < report.length; i++) {
+	    if (result[i] == null) {
+		break;
+	    }
+	    int ID = result[i].getTrackID();
+	    AudioTrack track = index.getTrack(ID);
+	    if (track == null) {
+		continue;
+	    }
+	    report[i][0] = track.getTrackID();
+	    report[i][1] = track.getName();
+	    report[i][2] = result[i].getDelta();
+	    report[i][3] = counter.get(result[i]);
+	}
+	
+	return report;
     }
     
     /**
@@ -136,7 +190,7 @@ public class Matcher {
 		@Override
 		public Object doInBackground() {
 		    try {
-			clip.play();
+			clip.play(0, clip.getDuration());
 		    } 
 		    catch (Exception e){
 			System.out.println(e.getMessage());
@@ -155,19 +209,9 @@ public class Matcher {
     }
     
     /**
-     * report result of the match
+     * main method of the program
      */
-    public void reportMatchResult(int hits, int trackID, int time) {
-	int min = time / 60;
-	int sec = time % 60;
-	String secStr = "";
-	if (sec > 10) {
-	    secStr += sec;
-	} else {
-	    secStr += "0" + sec;
-	}
-	String result = "Maximum " + hits + " hits on track ID " + trackID + 
-		" at time " + min + ":" + secStr + "\n";
-	JOptionPane.showMessageDialog(matcherGUI.getFrame(), result);
+    public static void main(String[] args) {
+	Matcher matcherApp = new Matcher();
     }
 }

@@ -1,33 +1,29 @@
 package clientapplication;
 
-import audioframe.Probe;
 
 /**
  * Pair of trackID and time difference as values in HashMap.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
-public class ID_TimeDiffPair {
-    // number of hits
-    private int hit;
-    
+public class ID_DeltaPair {    
     // ID of track which probe occurs
     private int trackID;
 
     // time of probe first occurrence
-    private int timeDiff;
+    private int delta;
 
     /**
      * create a ID_TimePair object
      * @param trackID		ID of track
-     * @param time		time of occurrence
+     * @param time1		time of first occurrence
+     * @param time2		time of second occurrence
      */
-    public ID_TimeDiffPair(int trackID, int timeDiff) {
-	hit = 0;
+    public ID_DeltaPair(int trackID, int time1, int time2) {
 	this.trackID = trackID;
-	this.timeDiff = timeDiff;
+	this.delta = time2 - time1;
     }
 
     @Override
@@ -45,11 +41,11 @@ public class ID_TimeDiffPair {
 	if (obj.getClass() != this.getClass()) {
 	    return false;
 	} 
-	ID_TimeDiffPair other = (ID_TimeDiffPair) obj;
-	if (this.getTimeDiff() != other.getTimeDiff()) {
+	ID_DeltaPair other = (ID_DeltaPair) obj;
+	if (delta != other.getDelta()) {
 	    return false;
 	} 
-	if (this.getTrackID() != other.getTrackID()) {
+	if (trackID != other.getTrackID()) {
 	    return false;
 	}
 	return true;
@@ -67,8 +63,8 @@ public class ID_TimeDiffPair {
      * get time difference from the pair
      * @return	time difference
      */
-    public int getTimeDiff() {
-	return timeDiff;
+    public int getDelta() {
+	return delta;
     }
     
     @Override
@@ -78,7 +74,7 @@ public class ID_TimeDiffPair {
      * @return		hash code of this object
      */
     public int hashCode() {
-	int code  = trackID * 31 + timeDiff * 37;
+	int code  = trackID * 37 + delta * 17;
 	return code;
     }
 }

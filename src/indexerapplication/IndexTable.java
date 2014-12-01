@@ -1,5 +1,4 @@
 package indexerapplication;
-import java.awt.Graphics;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -8,7 +7,7 @@ import javax.swing.table.DefaultTableModel;
  * JPanel that shows the index table values.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
 public class IndexTable extends JPanel{    
@@ -16,17 +15,23 @@ public class IndexTable extends JPanel{
     private JTable indexTable;
     
     // table model of the indexer
-    DefaultTableModel table;
+    private DefaultTableModel table;
     
     /**
      * create an IndexTable object
      * @param index	index to be drawn
      */
     public IndexTable(Index index) {
-	String[] name = new String[]{"Track ID", "Duration", 
-		"Peaks", "Probes"};
+	super();
+	String[] name = new String[]{"Track ID", "Track Name", 
+		"Duration", "Peaks", "Probes"};
 	table = new DefaultTableModel(name, 0);
-	indexTable = new JTable(table);
+	indexTable = new JTable(table) {
+	    @Override
+	    public boolean isCellEditable(int rowIndex, int columIndex) {
+		return false;
+	    }
+	};
 	indexTable.setFillsViewportHeight(true);
 	add(new JScrollPane(indexTable));
 	if (index.getSize() != 0) {
@@ -53,7 +58,29 @@ public class IndexTable extends JPanel{
      */
     public void addTrack(AudioTrack track) {
 	table.addRow(
-		new Object[]{track.getTrackID(), track.getDuration(),
-			track.getPeakNum(), track.getProbeNum()});
+		new Object[]{track.getTrackID(), track.getName(),
+			track.getDuration(), track.getPeakNum(), 
+			track.getProbeNum()});
+    }
+    
+    /**
+     * get the JTable indexTable
+     * @return		the JTable object
+     */
+    public JTable getTable() {
+	return indexTable;
+    }
+    
+    /**
+     * remove a row from the track
+     * @param trackID		row with the track ID to be removed
+     */
+    public void removeTrack(int trackID) {
+	for (int i = table.getRowCount() - 1; i >= 0; i--) {
+	    if (table.getValueAt(i, 0) == (Object)trackID) {
+		table.removeRow(i);
+		return;
+	    }
+	}
     }
 }

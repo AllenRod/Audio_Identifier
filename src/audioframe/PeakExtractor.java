@@ -8,7 +8,7 @@ import java.util.HashMap;
  * all power spectrums.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
 public class PeakExtractor {  
@@ -18,11 +18,7 @@ public class PeakExtractor {
     
     // number of peaks
     private int num;
-    
-    // HashMap of peaks
-    private HashMap<Integer, ArrayList<Integer>> peaks;
- 
-    
+        
     /**
      * create a PeakExtractor object
      * @param minPercentDiff 		
@@ -31,7 +27,6 @@ public class PeakExtractor {
      */
     public PeakExtractor(double minPercentDiff) {
 	this.minPercentDiff = minPercentDiff;
-	peaks = new HashMap<Integer, ArrayList<Integer>>();
 	num = 0;
     }
     
@@ -45,20 +40,21 @@ public class PeakExtractor {
      */
     private boolean compare(double prevMin, double currentMax, double nextMin) {
 	double minPower = currentMax * (1 - minPercentDiff);
-	if ((prevMin < minPower) && (minPower > nextMin)) {
-	    return true;
+	if ((prevMin >= minPower) && (minPower <= nextMin)) {
+	    return false;
 	}
-	return false;
+	return true;
     }
     
     /**
      * extract peaks from power spectrum
      * @param powerSpectrum	the power spectrums of audio
      */
-    public HashMap<Integer, ArrayList<Integer>> extractPeaks(double[][] powerSpectrum) {
-	if (!peaks.isEmpty()) {
-	    peaks.clear();
-	}
+    public HashMap<Integer, ArrayList<Integer>> 
+    	extractPeaks(double[][] powerSpectrum) {
+	// HashMap of peaks
+	HashMap<Integer, ArrayList<Integer>> peaks = new HashMap<>();
+
 	num = 0;
 	for (int i = 0; i < powerSpectrum.length; i++) {
 	    ArrayList<Integer> frequencies = new ArrayList<>();
@@ -86,8 +82,7 @@ public class PeakExtractor {
 		    }
 		    if (compare(prevMin, current, nextMin)) {
 			   if ( i > 0 && i < powerSpectrum.length - 1) {
-			       if (powerSpectrum[i - 1][j] > current 
-				       || powerSpectrum[i + 1][j] > current) {
+			       if (!compare(powerSpectrum[i-1][j],current,powerSpectrum[i+1][j])){
 				   	prevMin = nextMin;
 				   	j = skipIndex;
 			   		continue;

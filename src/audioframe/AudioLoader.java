@@ -1,5 +1,7 @@
 package audioframe;
 import java.io.*;
+import java.net.URL;
+
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -10,7 +12,7 @@ import javax.swing.*;
  * Loader that loads audio file
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 10/25/14
  */
 public class AudioLoader {
@@ -84,6 +86,27 @@ public class AudioLoader {
 		error(x.getMessage());
 		x.printStackTrace();
 	    }
+	}
+	return null;
+    }
+    
+    /**
+     * load an Audio with the given file path
+     * @param filePath		path of the file
+     * @return			the loaded audio
+     */
+    public Audio loadFromFile(URL filePath) {
+	try {
+	    AudioInputStream inStream = AudioSystem.getAudioInputStream(filePath);
+	    currentAudio = Audio.fromStream(inStream, filePath.getPath());
+	    inStream.close();
+	    return currentAudio;
+	} catch (UnsupportedAudioFileException x) {
+	    error(x.getMessage());
+	    x.printStackTrace();
+	} catch (IOException x) {
+	    error(x.getMessage());
+	    x.printStackTrace();
 	}
 	return null;
     }

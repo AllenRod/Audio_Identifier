@@ -4,10 +4,16 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 
+import audioframe.Audio;
 import audioframe.AudioAnalyser;
 import audioframe.AudioGraphView;
 import audioframe.AudioLoader;
@@ -16,7 +22,7 @@ import audioframe.AudioLoader;
  * GUI of the Indexer application.
  * 
  * @author Jiajie Li
- * CSE 260 PRJ 3
+ * CSE 260 PRJ 4
  * 11/15/14
  */
 public class IndexerGUI{
@@ -93,6 +99,30 @@ public class IndexerGUI{
 	});
 	file.add(loadTrack);
 	
+	JMenuItem removeTrack = new JMenuItem("Remove Track");
+	removeTrack.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		try {
+		    String idStr = 
+			    JOptionPane.showInputDialog(GUIFrame, 
+				    "Pleas input the ID value");
+		    int ID = Integer.parseInt(idStr);
+		    if (index.removeTrack(ID)) {
+			table.removeTrack(ID);
+		    } else {
+			JOptionPane.showMessageDialog(GUIFrame,
+				"Track not found. Please enter a valid value");
+		    }
+		} catch(NumberFormatException err) {
+		    JOptionPane.showMessageDialog(GUIFrame, 
+			    "Invalid input. Please try again");
+		}
+	    }
+	});
+	file.add(removeTrack);
+	
+	
 	JMenuItem viewTable = new JMenuItem("View Table");
 	viewTable.addActionListener(new ActionListener(){
 
@@ -108,10 +138,20 @@ public class IndexerGUI{
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		try {
-		    indexer.saveIndex();
-		} catch (IOException error) {
-		    // ???
+		JFileChooser chooser = new JFileChooser();
+		chooser.setDialogTitle("Save Audio Index");
+		chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+		int ret = chooser.showSaveDialog(GUIFrame);
+		if (ret == JFileChooser.APPROVE_OPTION) {
+		    try {
+			String fileName = chooser.getSelectedFile().getPath();
+			indexer.saveIndex(fileName);
+		    } catch (IOException x) {
+			JOptionPane.showMessageDialog(GUIFrame, x.getMessage());
+		    } catch (Throwable x) {
+			JOptionPane.showMessageDialog(GUIFrame, x.getMessage());
+			x.printStackTrace();
+		    }
 		}
 	    }
 	});
@@ -122,13 +162,27 @@ public class IndexerGUI{
 	    
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		try {
-		    indexer.loadIndex();
-		    index = indexer.getIndex();
-		    table = new IndexTable(index);
-		    tableFrame.repaint();
-		} catch (IOException error) {
-		    // ???
+		JFileChooser chooser = new JFileChooser();
+		chooser.setDialogTitle("Load Audio Index");
+		chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+		int ret = chooser.showOpenDialog(GUIFrame);
+		if (ret == JFileChooser.APPROVE_OPTION) {
+		    try {
+			String fileName = chooser.getSelectedFile().getPath();
+			if (!indexer.loadIndex(fileName)) 
+			    return;			  
+			index = indexer.getIndex();
+			table = new IndexTable(index);
+			tableFrame.getContentPane().removeAll();
+			tableFrame.getContentPane().add(table);
+			tableFrame.revalidate();
+			tableFrame.repaint();
+		    } catch (IOException x) {
+			JOptionPane.showMessageDialog(GUIFrame, x.getMessage());
+		    } catch (Throwable x) {
+			JOptionPane.showMessageDialog(GUIFrame, x.getMessage());
+			x.printStackTrace();
+		    }
 		}
 	    }
 	});
@@ -141,6 +195,7 @@ public class IndexerGUI{
 	    public void actionPerformed(ActionEvent e) {
 		GUIFrame.dispose();
 		tableFrame.dispose();
+		System.exit(0);
 	    }
 	});
 	file.add(quit);
@@ -152,7 +207,9 @@ public class IndexerGUI{
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		index.playTrack(track.getTrackID());
+		if (track != null) {
+		    index.playTrack(track.getTrackID());
+		}
 	    }
 	});
 	trackMenu.add(play);
@@ -196,6 +253,36 @@ public class IndexerGUI{
      */
     private void constructTableFrame() {
 	tableFrame.getContentPane().add(table);
+	
+	JMenuBar menuBar = new JMenuBar();
+	JMenu menu = new JMenu("Track");
+	
+	JMenuItem select = new JMenuItem("Select");
+	select.addActionListener(new ActionListener() {
+
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		int row = table.getTable().getSelectedRow();
+		if (row < 0) {
+		    JOptionPane.showMessageDialog(tableFrame, 
+			    "Please selected one row");
+		    return;
+		}
+		track = index.getTrack(
+			(int)table.getTable().getValueAt(row, 0));
+		if (track != null) {
+		    GUIFrame.getContentPane().removeAll();
+		    GUIFrame.getContentPane().add(new JScrollPane(track.getView()));
+		    GUIFrame.revalidate();
+		    GUIFrame.repaint();
+		}
+	    }
+	    
+	});
+	menu.add(select);
+	
+	menuBar.add(menu);
+	tableFrame.setJMenuBar(menuBar);
 	
 	tableFrame.pack();
 	tableFrame.setLocationByPlatform(true);

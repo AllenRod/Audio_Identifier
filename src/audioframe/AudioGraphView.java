@@ -11,7 +11,7 @@ import javax.swing.*;
  * The graph view of the audio.
  * 
  * @author Jiajie Li 
- * CSE 260 PRJ 3 
+ * CSE 260 PRJ 4
  * 10/25/14
  */
 public class AudioGraphView extends JPanel {
