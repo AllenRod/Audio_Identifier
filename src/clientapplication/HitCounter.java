@@ -3,7 +3,6 @@ package clientapplication;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,7 @@ import java.util.Map;
  * 11/23/14
  */
 public class HitCounter extends HashMap<ID_DeltaPair, Integer>{
+
     /**
      * create a HitCounter object
      */
